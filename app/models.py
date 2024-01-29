@@ -7,7 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField()
     profile_image = models.ImageField(upload_to="images/", null=True, blank=True)
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -21,7 +21,7 @@ class Profile(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255, unique=True)
+    slug = models.CharField(max_length=255, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -36,7 +36,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     last_updated = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     image = models.ImageField(upload_to="images/", null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True, related_name="post")
     view_count = models.IntegerField()

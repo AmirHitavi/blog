@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} BLOG | {{ post.title }} {% endblock title %}
+{% block content %}
+    <div class="container">
+        <div class="layout">
+            <!-- left layout -->
+            <div class="left">
+                <div class="page-top">
+                    <div class="top flex">
+                        <div class="page-name">
+                            <a href="{% url 'index' %}" class="learn">
+                                <span class="material-icons"> keyboard_return </span> Go back
+                            </a>
+                            <h1>Blog</h1>
+                        </div>
+                    </div>
+                </div>
+            <center>
+              <div class="typo">
+                <h1 class="title blog-title">{{ post.title | safe | title }}</h1>
+                <div class="timeline">
+                  <div class="track">
+                    <i class="uil uil-clock"></i>
+                    <p class="time">{{ post.last_updated | date }}</p>
+                  </div>
+                  <div class="track">
+                    <i class="uil uil-users-alt"></i>
+                    <p class="view-count">{{ post.view_count }} view{{ post.view_count | pluralize }}</p>
+                  </div>
+                  <div class="track">
+                    <form action="" method="POST">
+                      <button type="submit" class="btn btn-info">
+                        <i class="uil uil-bookmark-full"></i>
+                        <p class="bookmark">Bookmark</p>
+                        <!-- REMOVE BOOKMARK
+                          <i class="fa-solid fa-bookmark"></i> -->
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </center>
+            <section class="mt">
+              <div class="container">
+                <!-- blog post -->
+                <div class="blog-post">
+                  <div class="post-img blog-img">
+                    <img src="{{ post.image.url }}" alt="" />
+                  </div>
+                  <div class="blog-post-content">
+                      <p>{{ post.content | safe }}</p>
+                    <div class="blog-tags">
+                        {% for tag in post.tags.all %}
+                            <div class="tag">{{ tag.name }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="social-share">
+                      <div class="reactions">
+                        <div class="likes">
+                          <i class="uil uil-heart"></i> <span>200</span>
+                        </div>
+                        <div class="total-comments">
+                          <i class="uil uil-comment-alt"></i>
+                          <span>{{ count_comments }}</span>
+                        </div>
+                      </div>
+                      <div class="share">
+                        <div class="social">
+                          <a href="#">
+                            <i class="fa-brands fa-facebook-f"></i>
+                          </a>
+                          <a href="#">
+                            <i class="fa-brands fa-instagram"></i>
+                          </a>
+                          <a href="#">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                          </a>
+                          <a href="#">
+                            <i class="fa-brands fa-twitter"></i>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- comments -->
+                  {% for comment in comments %}
+                      <div class="user-comment">
+                          <div class="author">
+                              <div class="profile-pic">
+                                  <img src="{% static 'images/author.svg' %}" alt="" />
+                              </div>
+                              <div class="details">
+                                  <p>{{ comment.name | title}}</p>
+                                  <small>{{ comment.date | date }}</small>
+                              </div>
+                          </div>
+                          <div class="comment-sec-main">
+                              <div class="comment-sec">
+                                  <div class="comment">
+                                      <p>{{ comment.content }}</p>
+                                  </div>
+                                  <div class="reply">
+                                      <button onclick="toggleDiv(this)">Reply</button>
+                                  </div>
+                                  <div class="comment-box" id="comment-reply-box">
+                                      <h3>Reply to post</h3>
+                                      <p>Your email address will not be published. Required fields are marked<span>*</span></p>
+                            <form method="post">
+                                {% csrf_token %}
+                                {{ comment_form.content }}
+                              <div class="grid-3">
+                                  <input type="hidden" name="post_id" value="{{ post.id }}">
+                                  <input type="hidden" name="parent" value="{{ comment.id }}">
+                                  {{ comment_form.name }}
+                                  {{ comment_form.email }}
+                                  {{ comment_form.website }}
+                              </div>
+                                <button class="btn btn-primary rounded">Post Reply</button>
+                            </form>
+                                  </div>
+                              </div>
+                              {% for reply in comment.replies.all %}
+                                  <div class="public-reply">
+                                      <div class="author">
+                                          <div class="profile-pic">
+                                              <img src="{% static 'images/author.svg' %}" alt="" />
+                                          </div>
+                                          <div class="details">
+                                              <p>{{ reply.name | title }}</p>
+                                              <small>{{ reply.date | date }}</small>
+                                          </div>
+                                      </div>
+                                      <div class="comment">
+                                          <p>{{ reply.content | safe }}</p>
+                                      </div>
+                                  </div>
+                              {% endfor %}
+                          </div>
+                      </div>
+                  {% endfor %}
+                <div class="comment-box">
+                  <h3>Leave a new comment to this post</h3>
+                  <p>Your email address will not be published. Required fields are marked<span>*</span></p>
+                  <form method="post">
+                      {% csrf_token %}
+                      {{ comment_form.content }}
+                    <div class="grid-3">
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        {{ comment_form.name }}
+                        {{ comment_form.email }}
+                        {{ comment_form.website }}
+                    </div>
+                      <button class="btn btn-primary rounded">Post comment</button>
+                  </form>
+                </div>
+            </section>
+            </div>
+          <!-- left layout end -->
+
+          <!-- right layout -->
+            <div class="right">
+                <div class="block r-blog">
+                    <h2 class="title2">Top Posts</h2>
+                    {% for post in top_posts %}
+                        <!-- card -->
+                        <a href="{% url 'post_page' post.slug  %}">
+                            <div class="card">
+                                <div class="post-img">
+                                    <img src="{{ post.image.url }}" alt="" />
+                                    <div class="tag">{{ post.tags.all.0.name }}</div>
+                                </div>
+                                <div class="card-content">
+                                    <h3>{{ post.title | title | safe }}</h3>
+                                    <div class="author">
+                                        <div class="profile-pic">
+                                            <img src="{{ post.author.profile.profile_image.url }}" alt="" />
+                                        </div>
+                                        <div class="details">
+                                            <p>
+                                                {{ post.author.profile.user.first_name | safe | title }} {{ post.author.profile.user.last_name | safe | title }}
+                                            </p>
+                                            <small>{{ post.last_updated | date }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <!-- card end-->
+                    {% endfor %}
+                </div>
+                <div class="block r-blog">
+                    <h2 class="title2">Recent Posts</h2>
+                    {% for post in recent_posts %}
+                        <!-- card -->
+                        <a href="{% url 'post_page' post.slug  %}">
+                            <div class="card">
+                                <div class="post-img">
+                                    <img src="{{ post.image.url }}" alt="" />
+                                    <div class="tag">{{ post.tags.all.0.name }}</div>
+                                </div>
+                                <div class="card-content">
+                                    <h3>{{ post.content | safe }}</h3>
+                                    <div class="author">
+                                        <div class="profile-pic">
+                                            <img src="{{ post.author.profile.profile_image.url }}" alt="" />
+                                        </div>
+                                        <div class="details">
+                                            <p>
+                                                {{ post.author.profile.user.first_name | safe | title }} {{ post.author.profile.user.last_name | safe | title }}
+                                            </p>
+                                            <small>{{ post.last_updated | date }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <!-- card end-->
+                    {% endfor %}
+                    <div class="block">
+                        <h2 class="title2">Top Tags</h2>
+                        <div class="blog-tags">
+                            {% for tag in top_tags %}
+                                <div class="tag">{{ tag.name }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- right layout end -->
+            </div>
+        </div>
+{% endblock content %}

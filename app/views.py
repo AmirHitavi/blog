@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from .models import Post, WebsiteMeta, Comment, Tag, Profile
-from .forms import SubscribeForm, CommentForm
+from .forms import SubscribeForm, CommentForm, NewUserForm
 from django.db.models import Count
 from django.contrib.auth.models import User
+from django.contrib.auth import login
 
 
 def index(request):
@@ -146,3 +147,19 @@ def about(request):
         "website_info": website_info
     }
     return render(request, "app/about.html", context)
+
+
+def register_user(request):
+    form = NewUserForm()
+
+    if request.method == "POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("index")
+
+    context = {
+        "form": form
+    }
+    return render(request, "registration/registration.html", context)

@@ -39,7 +39,7 @@ class Post(models.Model):
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     image = models.ImageField(upload_to="images/", null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name="post")
-    view_count = models.IntegerField()
+    view_count = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     bookmarks = models.ManyToManyField(User, related_name="bookmarks", default=None, blank=True)

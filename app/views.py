@@ -4,6 +4,7 @@ from .forms import SubscribeForm, CommentForm
 from django.db.models import Count
 from django.contrib.auth.models import User
 
+
 def index(request):
     top_posts = Post.objects.all().order_by("-view_count")[:3]
     recent_posts = Post.objects.all().order_by("-last_updated")[:3]
@@ -16,7 +17,7 @@ def index(request):
         website_info = WebsiteMeta.objects.all()[0]
 
     if Post.objects.filter(is_featured=True).exists():
-        featured_post = Post.objects.filter(is_featured=True)[0]
+        featured_post = Post.objects.filter(is_featured=True).order_by('-last_updated')[0]
 
     if request.method == "POST":
         subscribe_form = SubscribeForm(request.POST)

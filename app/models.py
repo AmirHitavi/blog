@@ -38,7 +38,7 @@ class Post(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     image = models.ImageField(upload_to="images/", null=True, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True, related_name="post")
+    tags = models.ManyToManyField(Tag, blank=True, related_name="post")
     view_count = models.IntegerField()
     is_featured = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, WebsiteMeta, Comment, Tag, Profile
 from .forms import SubscribeForm, CommentForm, NewUserForm
 from django.db.models import Count
@@ -49,6 +49,20 @@ def post_page(request, slug):
     recent_posts = Post.objects.exclude(slug=slug).order_by("-last_updated")[:3]
     top_tags = Tag.objects.annotate(post_count=Count("post")).order_by("-post_count")[:10]
 
+    # Bookmark
+    bookmarked = False
+    if post.bookmarks.filter(id=request.user.id).exists():
+        bookmarked = True
+    is_bookmarked = bookmarked
+
+    # Like
+    liked = False
+    if post.likes.filter(id=request.user.id).exists():
+        liked = True
+    is_liked = liked
+
+    likes_count = post.number_of_likes()
+
     if request.method == "POST":
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -84,7 +98,10 @@ def post_page(request, slug):
         "comment_form": comment_form,
         "top_posts": top_posts,
         "recent_posts": recent_posts,
-        "top_tags": top_tags
+        "top_tags": top_tags,
+        "is_bookmarked": is_bookmarked,
+        "is_liked": is_liked,
+        "likes_count": likes_count
     }
     return render(request, "app/post.html", context)
 
@@ -163,3 +180,25 @@ def register_user(request):
         "form": form
     }
     return render(request, "registration/registration.html", context)
+
+
+def bookmark_post(request, slug):
+    post = get_object_or_404(Post, id=request.POST.get('post_id'))
+
+    if post.bookmarks.filter(id=request.user.id).exists():
+        post.bookmarks.remove(request.user)
+    else:
+        post.bookmarks.add(request.user)
+
+    return redirect("post_page", slug=slug)
+
+
+def like_post(request, slug):
+    post = get_object_or_404(Post, id=request.POST.get('post_id'))
+
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+
+    return redirect("post_page", slug=slug)

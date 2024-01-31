@@ -47,6 +47,7 @@ def post_page(request, slug):
     comment_form = CommentForm()
     top_posts = Post.objects.exclude(slug=slug).order_by("-view_count")[:3]
     recent_posts = Post.objects.exclude(slug=slug).order_by("-last_updated")[:3]
+    top_authors = User.objects.filter(is_staff=True).annotate(post_count=Count("post")).order_by("-post_count")[:3]
     top_tags = Tag.objects.annotate(post_count=Count("post")).order_by("-post_count")[:10]
 
     # Bookmark
@@ -98,6 +99,7 @@ def post_page(request, slug):
         "comment_form": comment_form,
         "top_posts": top_posts,
         "recent_posts": recent_posts,
+        "top_authors": top_authors,
         "top_tags": top_tags,
         "is_bookmarked": is_bookmarked,
         "is_liked": is_liked,
@@ -235,3 +237,12 @@ def all_liked_posts(request):
         return render(request, "app/all_liked_posts.html", context)
     except TypeError:
         return redirect("login")
+
+
+def all_authors(request):
+    authors = User.objects.filter(is_staff=True)
+
+    context = {
+        'authors': authors
+    }
+    return render(request, "app/all_authors.html", context)

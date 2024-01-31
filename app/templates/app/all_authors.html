@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}
+    BLOG | All Posts
+{% endblock title %}
+{% block content %}
+    <main>
+        <div class="container">
+            <div class="page-top">
+                <div class="top flex">
+                    <div class="page-name">
+                        <a href="{% url 'index' %}" class="learn">
+                            <span class="material-icons"> keyboard_return </span> Go back
+                        </a>
+                        <h1>All Authors</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <section class="sp">
+        <div class="container">
+            <div class="blog-tags">
+                {% for author in authors %}
+                    <!-- card -->
+                    <a href="{% url 'author_page' author.profile.slug %}">
+                        <div class="card">
+                            <div class="rounded-img">
+                                <img src="{{ author.profile.profile_image.url }}" alt="" />
+                            </div>
+                            <div class="card-content">
+                                {% if author.first_name and author.last_name %}
+                                    <h3> {{ author.first_name | title }} {{ author.last_name | title }} </h3>
+                                {% else %}
+                                    <h3> {{ author.username | title }} </h3>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    <!-- card end-->
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock content %}

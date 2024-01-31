@@ -202,3 +202,36 @@ def like_post(request, slug):
         post.likes.add(request.user)
 
     return redirect("post_page", slug=slug)
+
+
+def all_posts(request):
+    posts = Post.objects.all()
+
+    context = {
+        "posts": posts
+    }
+    return render(request, "app/all_posts.html", context)
+
+
+def all_bookmarked_posts(request):
+    try:
+        bookmarked_posts = Post.objects.filter(bookmarks=request.user)
+
+        context = {
+            'bookmarked_posts': bookmarked_posts
+        }
+        return render(request, 'app/all_bookmarked_posts.html', context)
+    except TypeError:
+        return redirect("login")
+
+
+def all_liked_posts(request):
+    try:
+        liked_posts = Post.objects.filter(likes=request.user)
+
+        context = {
+            'liked_posts': liked_posts
+        }
+        return render(request, "app/all_liked_posts.html", context)
+    except TypeError:
+        return redirect("login")
